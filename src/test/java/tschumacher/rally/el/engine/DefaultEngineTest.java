@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package tschumacher.rally.el;
+package tschumacher.rally.el.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,17 +13,19 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import tschumacher.rally.el.Context;
+import tschumacher.rally.el.Engine;
+import tschumacher.rally.el.Template;
 import tschumacher.rally.el.context.DefaultContext;
-import tschumacher.rally.el.engine.DefaultEngine;
 import tschumacher.rally.el.template.DefaultTemplate;
 
 /**
  *
  * @author Timothy Schumacher, Ph.D. <schumact@gmail.com>
  */
-public class PropertiesTest {
+public class DefaultEngineTest {
 	
-	public PropertiesTest() {
+	public DefaultEngineTest() {
 	}
 	
 	@BeforeClass
@@ -161,7 +163,7 @@ public class PropertiesTest {
 	}
 
 	private static Properties LoadProperties(String resource) {
-		InputStream resourceAsStream = PropertiesTest.class.getClassLoader().getResourceAsStream(resource);
+		InputStream resourceAsStream = DefaultEngineTest.class.getClassLoader().getResourceAsStream(resource);
 		Properties properties = new Properties();
 		try {
 			properties.load(resourceAsStream);

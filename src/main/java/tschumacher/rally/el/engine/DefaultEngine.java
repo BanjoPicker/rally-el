@@ -57,19 +57,6 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 					break;
 			}
 		}
-
 		return stack.pop().toString();
-
-
-		
 	}
-
-	private void ProcessChar(char c, Stack<StringBuilder> sb) {
-		switch(c) {
-			default: 
-				sb.peek().append(c);
-				break;
-		}
-	}
-
 }

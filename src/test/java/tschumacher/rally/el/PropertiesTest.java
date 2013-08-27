@@ -13,24 +13,15 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import tschumacher.rally.el.context.DefaultContext;
+import tschumacher.rally.el.engine.DefaultEngine;
+import tschumacher.rally.el.template.DefaultTemplate;
 
 /**
  *
  * @author Timothy Schumacher, Ph.D. <schumact@gmail.com>
  */
 public class PropertiesTest {
-
-	private static Context getContext(Properties properties) {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-
-	private static Template getTemplate(String TEMPLATE) {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-
-	private static Engine getEngine() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
 	
 	public PropertiesTest() {
 	}
@@ -133,6 +124,18 @@ public class PropertiesTest {
 		PerformTest(LoadProperties("test10.properties"));
 	}
 
+	@Test
+	public void test11() {
+		Engine engine = new DefaultEngine();
+		Context context = getContext(new Properties());
+		context.setAttribute("test", 11);
+		context.setAttribute("int", 36);
+		Template template = getTemplate("test ${test}: an int = ${int}");
+		String output = engine.evaluate(template, context);
+		System.out.println(output);
+		assertEquals("test 11: an int = 36", output);
+	}
+
 	private static Properties LoadProperties(String resource) {
 		InputStream resourceAsStream = PropertiesTest.class.getClassLoader().getResourceAsStream(resource);
 		Properties properties = new Properties();
@@ -159,7 +162,20 @@ public class PropertiesTest {
 		String output = engine.evaluate(template, context);
 
 		/* now compare our desired output with our actual output. */
+		System.out.println(output);
 		assertEquals(OUTPUT, output);
+	}
+
+	private static tschumacher.rally.el.Context getContext(Properties properties) {
+		return new DefaultContext(properties);
+	}
+
+	private static tschumacher.rally.el.Template getTemplate(String TEMPLATE) {
+		return new DefaultTemplate(TEMPLATE);
+	}
+
+	private static tschumacher.rally.el.Engine getEngine() {
+		return new DefaultEngine();
 	}
 
 	private static final String PROP_TEMPLATE = "template";

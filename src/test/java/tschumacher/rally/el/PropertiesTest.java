@@ -148,6 +148,18 @@ public class PropertiesTest {
 		assertEquals("test 11: an int = 36", output);
 	}
 
+	@Test(expected=tschumacher.rally.el.Exception.class)
+	public void test13() {
+		Engine engine = new DefaultEngine();
+		Context context = getContext(new Properties());
+		context.setAttribute("test", 11);
+		context.setAttribute("int", 36);
+		Template template = getTemplate("test ${test}: an int = ${int");  // open a ${ without closing it
+		String output = engine.evaluate(template, context);
+		System.out.println(output);
+		assertEquals("test 11: an int = 36", output);
+	}
+
 	private static Properties LoadProperties(String resource) {
 		InputStream resourceAsStream = PropertiesTest.class.getClassLoader().getResourceAsStream(resource);
 		Properties properties = new Properties();

@@ -57,6 +57,9 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 					break;
 			}
 		}
+		if(stack.size() > 1) {
+			throw new tschumacher.rally.el.Exception("error parsing input.  malformed expression [unclosed '${'?]");
+		}
 		return stack.pop().toString();
 	}
 }

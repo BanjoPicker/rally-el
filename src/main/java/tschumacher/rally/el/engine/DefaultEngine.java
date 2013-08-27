@@ -41,7 +41,11 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 					break;
 
 				case '$': // eat the control character and process the next one:
-					c = template.charAt(++i);
+					try {
+						c = template.charAt(++i);
+					} catch(IndexOutOfBoundsException oobe) {
+						throw new tschumacher.rally.el.Exception("error parsing expression, ended with $", oobe);
+					}
 					switch(c) {
 						case '{': stack.push(new StringBuilder()); break;
 						default : stack.peek().append(c); break;

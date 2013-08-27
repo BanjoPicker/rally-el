@@ -9,6 +9,12 @@ import tschumacher.rally.el.Template;
  * @author Timothy Schumacher, Ph.D. <schumact@gmail.com>
  */
 public class DefaultEngine implements tschumacher.rally.el.Engine {
+	private final Stack<StringBuilder> stack;
+	private Context context;
+
+	public DefaultEngine() {
+		this.stack = new Stack<StringBuilder>();
+	}
 
 	public String evaluate(Template template, Context context) {
 		if(template == null) {
@@ -19,7 +25,8 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 			throw new tschumacher.rally.el.Exception("The context was null.");
 		}
 
-		final Stack<StringBuilder> stack = new Stack<StringBuilder>();
+		this.context = context;
+		stack.clear();
 		stack.push(new StringBuilder());
 
 		for(int i=0;i<template.length();i++) {
@@ -27,14 +34,7 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 			switch(c) {
 				case '}': 
 					if(stack.size() > 1) {
-						StringBuilder top = stack.pop();
-						final String KEY = top.toString().trim();
-						Object value = context.getAttribute(KEY);
-						if(value != null) {
-							stack.peek().append(value.toString());
-						} else {
-							throw new tschumacher.rally.el.Exception("property " + KEY + " could not be located in any context");
-						}
+						popWrite();
 					} else {
 						stack.peek().append(c);
 					}
@@ -61,5 +61,16 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 			throw new tschumacher.rally.el.Exception("error parsing input.  malformed expression [unclosed '${'?]");
 		}
 		return stack.pop().toString();
+	}
+
+	private void popWrite() {
+		StringBuilder top = stack.pop();
+		final String KEY = top.toString().trim();
+		Object value = context.getAttribute(KEY);
+		if(value != null) {
+			stack.peek().append(value.toString());
+		} else {
+			throw new tschumacher.rally.el.Exception("property " + KEY + " could not be located in any context");
+		}
 	}
 }

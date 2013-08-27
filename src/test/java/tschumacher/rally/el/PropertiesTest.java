@@ -132,7 +132,7 @@ public class PropertiesTest {
 		context.setAttribute("int", 36);
 		Template template = getTemplate("test ${test}: an int = ${int}");
 		String output = engine.evaluate(template, context);
-		System.out.println(output);
+		//System.out.println(output);
 		assertEquals("test 11: an int = 36", output);
 	}
 
@@ -144,7 +144,7 @@ public class PropertiesTest {
 		context.setAttribute("int", 36);
 		Template template = getTemplate("test ${test}: an int = ${int}$");
 		String output = engine.evaluate(template, context);
-		System.out.println(output);
+		//System.out.println(output);
 		assertEquals("test 11: an int = 36", output);
 	}
 
@@ -156,7 +156,7 @@ public class PropertiesTest {
 		context.setAttribute("int", 36);
 		Template template = getTemplate("test ${test}: an int = ${int");  // open a ${ without closing it
 		String output = engine.evaluate(template, context);
-		System.out.println(output);
+		//System.out.println(output);
 		assertEquals("test 11: an int = 36", output);
 	}
 
@@ -186,7 +186,7 @@ public class PropertiesTest {
 		String output = engine.evaluate(template, context);
 
 		/* now compare our desired output with our actual output. */
-		System.out.println(output);
+		//System.out.println(output);
 		assertEquals(OUTPUT, output);
 	}
 

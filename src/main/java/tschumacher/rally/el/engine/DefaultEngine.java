@@ -9,11 +9,8 @@ import tschumacher.rally.el.Template;
  * @author Timothy Schumacher, Ph.D. <schumact@gmail.com>
  */
 public class DefaultEngine implements tschumacher.rally.el.Engine {
-	private final Stack<StringBuilder> stack;
-	private Context context;
 
 	public DefaultEngine() {
-		this.stack = new Stack<StringBuilder>();
 	}
 
 	public String evaluate(Template template, Context context) {
@@ -25,8 +22,7 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 			throw new tschumacher.rally.el.Exception("The context was null.");
 		}
 
-		this.context = context;
-		stack.clear();
+		final Stack<StringBuilder> stack = new Stack<StringBuilder>();
 		stack.push(new StringBuilder());
 
 		for(int i=0;i<template.length();i++) {
@@ -34,7 +30,7 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 			switch(c) {
 				case '}': 
 					if(stack.size() > 1) {
-						popWrite();
+						popWrite(context, stack);
 					} else {
 						stack.peek().append(c);
 					}
@@ -63,7 +59,10 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 		return stack.pop().toString();
 	}
 
-	private void popWrite() {
+    /**
+     *  <p>A small helper function.</p>
+     */
+	private void popWrite(Context context, Stack<StringBuilder> stack) {
 		StringBuilder top = stack.pop();
 		final String KEY = top.toString().trim();
 		Object value = context.getAttribute(KEY);

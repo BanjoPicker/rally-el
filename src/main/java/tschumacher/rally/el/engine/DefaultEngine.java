@@ -66,10 +66,9 @@ public class DefaultEngine implements tschumacher.rally.el.Engine {
 		StringBuilder top = stack.pop();
 		final String KEY = top.toString().trim();
 		Object value = context.getAttribute(KEY);
-		if(value != null) {
-			stack.peek().append(value.toString());
-		} else {
+		if(value == null) {  // handle failed lookup with an exception per requirements.
 			throw new tschumacher.rally.el.Exception("property " + KEY + " could not be located in any context");
-		}
+		} 
+		stack.peek().append(value.toString());
 	}
 }

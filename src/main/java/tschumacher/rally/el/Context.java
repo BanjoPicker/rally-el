@@ -1,12 +1,16 @@
 package tschumacher.rally.el;
 
 /**
- *  <p>An expression language context.  This is a map-like structure for holding key-value pairs to be used in a template engine.</p>
+ *  <p>
+        An expression language context.  This is a map-like structure for 
+        holding key-value pairs to be used in a template engine.
+    </p>
  */
 public interface Context {
 
     /**
-     *  <p>Put an object on the context under the specified key.  If object is null, remove the key from the context.</p>
+     *  <p>Put an object on the context under the specified key.</p>
+     *  <p>If the value is null, remove the specified key from this context.</p>
      */
     public void setAttribute(String key, Object value);
 

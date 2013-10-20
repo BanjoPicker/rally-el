@@ -45,165 +45,258 @@ public class DefaultEngineTest {
 	}
 
 	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void testNull01() {
-		Context context   = getContext(new Properties());
-		Engine  engine    = getEngine();
+	public void testNullEvaluateCall01() {
+		Context context = new DefaultContext();
+		Engine engine = new DefaultEngine();
 		engine.evaluate(null, context);
 	}
 	
 	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void testNull02() {
-		Template template = getTemplate("Hello, ${user}!");
-		Engine  engine    = getEngine();
+	public void testNullEvaluateCall02() {
+		Template template = new DefaultTemplate("Hello, ${user}!");
+		Engine engine = new DefaultEngine();
 		engine.evaluate(template, null);
 	}
 
 	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void testNull03() {
-		Engine  engine    = getEngine();
+	public void testNullEvaluateCall03() {
+		Engine  engine = new DefaultEngine();
 		engine.evaluate(null, null);
 	}
 
 	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void testPropertyNotFound01() {
-		Properties properties = new Properties();
-		properties.setProperty("firstName", "Timothy");
+	public void testAttributeNotFound() {
+		final Template template = new DefaultTemplate("My name is ${firstName} ${lastName}");
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
 
-		Context context = getContext(properties);
-		Template template = getTemplate("My name is ${firstName} ${lastName}");
-		Engine engine = getEngine();
+        // missed an attribute, should trigger exception
+        context.setAttribute("firstName", "Timothy");
+        
 		engine.evaluate(template, context);
 	}
 	
 
 	@Test
-	public void test01() {
-		PerformTest(LoadProperties("test01.properties"));
+	public void testSimpleEvaluationHelloWorld() {
+        final Template template = new DefaultTemplate("Hello, ${user}!");
+        final Context context   = new DefaultContext();     
+        final Engine engine     = new DefaultEngine();
+        context.setAttribute("user", "World");
+        
+        final String actualOutput  = engine.evaluate(template, context);
+        final String desiredOutput = "Hello, World!";
+        
+        assertEquals(desiredOutput, actualOutput);
 	}
 	
+
+
+
+
+
+
+
+    /** test to make sure templates that have various 
+     *  combinations of whitespace around keys also work. */
 	@Test
-	public void test02() {
-		PerformTest(LoadProperties("test02.properties"));
+	public void testHelloWorldWhiteSpace() {
+
+        // create the context, engine and templates:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+        final Template[] templates = {   
+            new DefaultTemplate("Hello, ${   user}!"), 
+            new DefaultTemplate("Hello, ${user   }!"),
+            new DefaultTemplate("Hello, ${ user }!"),
+            new DefaultTemplate("Hello, ${  user }!"),
+            new DefaultTemplate("Hello, ${ user  }!")   };
+
+        // set up our context:
+        context.setAttribute("user", "World");
+        
+        // what we expect to get out:
+        final String desiredOutput = "Hello, World!";
+        
+        // now compare the actual results for each template:
+        for(Template template : templates) {
+            String actualOutput = engine.evaluate(template, context);
+            assertEquals(desiredOutput, actualOutput);
+        }
 	}
 
+
+
+
+
+
 	@Test
-	public void test03() {
-		PerformTest(LoadProperties("test03.properties"));
+	public void testNestedEvaluation() {
+        // create the context, engine and template:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+        final Template template = new DefaultTemplate("Hello, ${ ${ var  }   }!");
+
+        // populate the context 
+        context.setAttribute("var","user");
+        context.setAttribute("user","World");
+        
+        // what we expect to get out given the above:
+        final String desiredOutput = "Hello, World!";
+
+        // what we actually get out:
+        final String actualOutput  = engine.evaluate(template, context);
+        
+        // compare results:
+        assertEquals(desiredOutput, actualOutput);
 	}
 	
-	@Test
-	public void test04() {
-		PerformTest(LoadProperties("test04.properties"));
-	}
+
+
+
+
+
+
+
+
+
+
+
 
 	@Test
-	public void test05() {
-		PerformTest(LoadProperties("test05.properties"));
+	public void testKeysWithEscapeCharacter() {
+
+        // create the context, engine and template:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+        // note, since $ is escape, we have to write $$ 
+        final Template template = new DefaultTemplate("${te$$t}");
+
+        // populate the context 
+        context.setAttribute("te$t","it works!");
+        
+        // what we expect to get out given the above:
+        final String desiredOutput = "it works!";
+
+        // what we actually get out:
+        final String actualOutput  = engine.evaluate(template, context);
+        
+        // compare results:
+        assertEquals(desiredOutput, actualOutput);
 	}
 
-	@Test
-	public void test06() {
-		PerformTest(LoadProperties("test06.properties"));
-	}
 
-	@Test
-	public void test07() {
-		PerformTest(LoadProperties("test07.properties"));
-	}
+
 	
 	@Test
-	public void test08() {
-		PerformTest(LoadProperties("test08.properties"));
+	public void testEscapeCharInOutput() {
+
+        // set up the context, engine and template:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+		final Template template = new DefaultTemplate("I want to work at ${desiredCompany} and make $$${desiredSalary}/year!");
+		
+        // set up the context 
+        context.setAttribute("desiredCompany", "Rally Software");
+		context.setAttribute("desiredSalary", "250,000");
+
+        final String desiredOutput   = "I want to work at Rally Software and make $250,000/year!";
+		final String actualOutput = engine.evaluate(template, context);
+
+		assertEquals(desiredOutput, actualOutput);
 	}
 
-	@Test
-	public void test09() {
-		PerformTest(LoadProperties("test09.properties"));
-	}
+
+
+
+
 
 	@Test
-	public void test10() {
-		PerformTest(LoadProperties("test10.properties"));
+	public void testEscapeSequences() {
+        // set up the context, engine and template:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+        final Template template = new DefaultTemplate("$${firstName} = ${firstName}, $${lastName} = ${lastName}");
+
+        // populate the context:
+        context.setAttribute("firstName", "Timothy");
+		context.setAttribute("lastName", "Schumacher");
+
+        final String desiredOutput = "${firstName} = Timothy, ${lastName} = Schumacher";
+		final String actualOutput = engine.evaluate(template, context);
+
+        // compare the actual with the desired:
+		assertEquals(desiredOutput, actualOutput);
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     *  Test a attribute set that has some values other than string, e.g. int
+     */
 	@Test
-	public void test11() {
-		Engine engine = new DefaultEngine();
-		Context context = getContext(new Properties());
-		context.setAttribute("test", 11);
+	public void testStringIntegerKVPairs() {
+
+        // set up the context, engine and template:
+        final Context context = new DefaultContext();     
+        final Engine engine = new DefaultEngine();
+		final Template template = new DefaultTemplate("test ${test}: an int = ${int}");
+		
+        // set up the context with non-string values:
+        context.setAttribute("test", 11);
 		context.setAttribute("int", 36);
-		Template template = getTemplate("test ${test}: an int = ${int}");
-		String output = engine.evaluate(template, context);
-		//System.out.println(output);
-		assertEquals("test 11: an int = 36", output);
+
+        final String desiredOutput = "test 11: an int = 36";
+		final String actualOutput = engine.evaluate(template, context);
+
+		assertEquals(desiredOutput, actualOutput);
+	}
+
+
+
+	@Test(expected=tschumacher.rally.el.Exception.class)
+	public void testDanglingEscapeCharAtEndOfTemplate() {
+
+		final Engine engine = new DefaultEngine();
+		final Context context = new DefaultContext();
+        // bad template: dangling "$" at end of template string:
+		final Template template = new DefaultTemplate("test ${test}: an int = ${int}$");
+		
+        // populate the context:
+        context.setAttribute("test", 11);
+		context.setAttribute("int", 36);
+		
+        final String desiredOutput = "test 11: an int = 36";
+        final String actualOutput = engine.evaluate(template, context);
+		
+        assertEquals(desiredOutput, actualOutput);
 	}
 
 	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void test12() {
-		Engine engine = new DefaultEngine();
-		Context context = getContext(new Properties());
-		context.setAttribute("test", 11);
-		context.setAttribute("int", 36);
-		Template template = getTemplate("test ${test}: an int = ${int}$");
-		String output = engine.evaluate(template, context);
-		//System.out.println(output);
-		assertEquals("test 11: an int = 36", output);
-	}
+	public void testUnclosedBracesMalformedTemplate() {
 
-	@Test(expected=tschumacher.rally.el.Exception.class)
-	public void test13() {
-		Engine engine = new DefaultEngine();
-		Context context = getContext(new Properties());
-		context.setAttribute("test", 11);
-		context.setAttribute("int", 36);
-		Template template = getTemplate("test ${test}: an int = ${int");  // open a ${ without closing it
-		String output = engine.evaluate(template, context);
-		//System.out.println(output);
-		assertEquals("test 11: an int = 36", output);
-	}
-
-	private static Properties LoadProperties(String resource) {
-		InputStream resourceAsStream = DefaultEngineTest.class.getClassLoader().getResourceAsStream(resource);
-		Properties properties = new Properties();
-		try {
-			properties.load(resourceAsStream);
-		} catch (IOException ex) {
-			throw new IllegalArgumentException("Could not load " + resource, ex);
-		}
-		return properties;
-	}
-
-	private static void PerformTest(Properties properties) {
-		final String TEMPLATE = properties.getProperty(PROP_TEMPLATE);
-		final String OUTPUT = properties.getProperty(PROP_OUTPUT);
+		final Engine engine = new DefaultEngine();
+		final Context context = new DefaultContext();
+        // bad template: open a "${" without closing it:
+		final Template template = new DefaultTemplate("test ${test}: an int = ${int");
 		
-		// clean out our properties:
-		properties.remove(PROP_OUTPUT);
-		properties.remove(PROP_TEMPLATE);
+        context.setAttribute("test", 11);
+		context.setAttribute("int", 36);
 
-		Context context   = getContext(properties);
-		Template template = getTemplate(TEMPLATE);
-		Engine  engine    = getEngine();
-		
-		String output = engine.evaluate(template, context);
+        final String desiredOutput = "test 11: an int = 36";
+        final String actualOutput = engine.evaluate(template, context);
 
-		/* now compare our desired output with our actual output. */
-		//System.out.println(output);
-		assertEquals(OUTPUT, output);
+        assertEquals(desiredOutput, actualOutput);
 	}
 
-	private static tschumacher.rally.el.Context getContext(Properties properties) {
-		return new DefaultContext(properties);
-	}
-
-	private static tschumacher.rally.el.Template getTemplate(String TEMPLATE) {
-		return new DefaultTemplate(TEMPLATE);
-	}
-
-	private static tschumacher.rally.el.Engine getEngine() {
-		return new DefaultEngine();
-	}
-
-	private static final String PROP_TEMPLATE = "template";
-	private static final String PROP_OUTPUT   = "output";
 }

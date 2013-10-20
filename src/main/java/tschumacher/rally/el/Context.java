@@ -12,7 +12,7 @@ public interface Context {
      *  <p>Put an object on the context under the specified key.</p>
      *  <p>If the value is null, remove the specified key from this context.</p>
      */
-    public void setAttribute(String key, Object value);
+    public Context setAttribute(String key, Object value);
 
     /**
      *  <p>Retrieve an object from the context.  Returns null if no object present under the given key.</p>

@@ -31,12 +31,13 @@ public class DefaultContext implements tschumacher.rally.el.Context {
 	}
 
 	
-	public void setAttribute(String key, Object value) {
+	public tschumacher.rally.el.Context setAttribute(String key, Object value) {
 		if(value == null) {
 			map.remove(key);
 		} else {
 			map.put(key, value);
 		}
+        return this;
 	}
 
 	public Object getAttribute(String key) {

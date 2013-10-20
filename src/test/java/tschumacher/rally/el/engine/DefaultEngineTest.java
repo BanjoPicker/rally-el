@@ -194,7 +194,8 @@ public class DefaultEngineTest {
         // set up the context, engine and template:
         final Context context = new DefaultContext();     
         final Engine engine = new DefaultEngine();
-		final Template template = new DefaultTemplate("I want to work at ${desiredCompany} and make $$${desiredSalary}/year!");
+		final Template template = new DefaultTemplate(
+                "I want to work at ${desiredCompany} and make $$${desiredSalary}/year!");
 		
         // set up the context 
         context.setAttribute("desiredCompany", "Rally Software");
